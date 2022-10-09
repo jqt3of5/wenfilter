@@ -248,7 +248,6 @@ uint16_t HAFan::calculateSerializedLength(const char* serializedDevice) const
 
     return size; // excludes null terminator
 }
-
 bool HAFan::writeSerializedData(const char* serializedDevice) const
 {
     if (serializedDevice == nullptr) {

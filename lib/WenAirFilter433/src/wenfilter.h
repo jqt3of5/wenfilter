@@ -19,7 +19,7 @@ enum WenFilterTime {
     None = 0,
     OneHour = 1,
     TwoHour = 2,
-    ThreeHour = 3
+    FourHour = 3
 };
 
 enum WenCommand{

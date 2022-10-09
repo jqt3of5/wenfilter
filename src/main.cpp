@@ -60,30 +60,41 @@ void setup(){
     //configure air filter radio
     wenAirFilter->setAvailability(true);
     wenAirFilter->setName("WEN Air Filter");
-    wenAirFilter->setSpeedRangeMin(0);
+    //I tried to set this to 0, because a 0 speed makes sense to be "off". But the underlying calculation uses a log10() which returns -1... causing off by one errors in the json serialization... causing frequent diconnects from the mqtt server
+    wenAirFilter->setSpeedRangeMin(1);
     wenAirFilter->setSpeedRangeMax(3);
     wenAirFilter->onSpeedChanged([](uint16_t speed) {
+        Serial.write("speed: ");
+        Serial.println(speed);
        switch(speed){
-           case 0:
+           default:
+               wenAirFilter->setState(false);
                wenAirFilterDevice.setOffClear();
                break;
            case 1:
+               wenAirFilter->setState(true);
                wenAirFilterDevice.setOnState(WenFilterSpeed::Low, WenFilterTime::None);
                break;
            case 2:
+               wenAirFilter->setState(true);
                wenAirFilterDevice.setOnState(WenFilterSpeed::Medium, WenFilterTime::None);
                break;
            case 3:
+               wenAirFilter->setState(true);
                wenAirFilterDevice.setOnState(WenFilterSpeed::High, WenFilterTime::None);
                break;
        }
     });
 
     wenAirFilter->onStateChanged([](bool state) {
+        Serial.write("state: ");
+        Serial.println(state);
         if (state) {
-           wenAirFilterDevice.setOnState(WenFilterSpeed::Low, WenFilterTime::None);
+            if (wenAirFilter->getSpeed() == 0)
+               wenAirFilter->setSpeed(1);
         } else {
-            wenAirFilterDevice.setOffClear();
+            if (wenAirFilter->getSpeed() > 0)
+                wenAirFilter->setSpeed(0);
         }
     });
 
